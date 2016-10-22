@@ -93,7 +93,7 @@ public class HTM {
             ArrayList<Column> n = new ArrayList<>();
             for (int j = i - INHIBITION_RADIUS; j <= i + INHIBITION_RADIUS; j++)
             {
-                if(j > 0 && j < NUMBER_OF_COLUMN && j != i)
+                if(j >= 0 && j < NUMBER_OF_COLUMN && j != i)
                 {
                     n.add(columns.get(j));
                     //System.out.println(j);
@@ -193,6 +193,11 @@ public class HTM {
         s += "Values:";
         for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
             s += " " + columns.get(i).getCurrentValue();
+        }
+         s += System.lineSeparator() + t + System.lineSeparator();
+        s += "boost:";
+        for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
+            s += " " + columns.get(i).getBoost();
         }
         s += System.lineSeparator();
         return s;

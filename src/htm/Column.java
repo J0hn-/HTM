@@ -29,8 +29,6 @@ public class Column {
     private ArrayList<Boolean> activations = new ArrayList<>(); // list of its 1000 last states (activated or not)
     private ArrayList<Boolean> significantOverlaps = new ArrayList<>(); // list of ots 1000 last significant overlaps states (sgnificant activated or not)
 
-    private int activationHistory;
-
     private ArrayList<Cell> cells = new ArrayList<>();
 
     public Column(double MIN_OVERLAP) {
@@ -38,7 +36,6 @@ public class Column {
         this.activated = false;
         this.boost = 1;
         this.currentValue = 0;
-        this.activationHistory = 0;
         activations.add(false);
         significantOverlaps.add(false);
     }
@@ -58,7 +55,7 @@ public class Column {
     }
 
     public void updateActivations() {
-        activations.add((activated));
+        activations.add(activated);
         if (activations.size() > 1000) {
             activations.remove(0);
         }
@@ -72,7 +69,7 @@ public class Column {
                 compteur++;
             }
         }
-        return (double) compteur / (double) activations.size();
+        return (double) compteur / activations.size();
     }
 
     public void updateSignificantOverlaps() {
@@ -90,7 +87,7 @@ public class Column {
                 compteur++;
             }
         }
-        return (double) compteur / (double) significantOverlaps.size();
+        return (double) compteur / significantOverlaps.size();
     }
 
     // learning over the dendrite
@@ -104,11 +101,14 @@ public class Column {
     public void inhibition(int DESIRED_LOCAL_ACTIVITY) {
         ArrayList<Column> sortedNeighbors = getsNeighbors();
         sortedNeighbors.sort((c1, c2) -> Double.compare(c2.getCurrentValue(), c1.getCurrentValue()));
-        double minLocalActivity = getsNeighbors().get(DESIRED_LOCAL_ACTIVITY - 1).getCurrentValue();
+        double minLocalActivity = sortedNeighbors.get(DESIRED_LOCAL_ACTIVITY - 1).getCurrentValue();
 
-        if (getCurrentValue() > 0 && getCurrentValue() > minLocalActivity) {
-            //setActivated(true);
-            activate();
+        if (getCurrentValue() > 0 && getCurrentValue() >= minLocalActivity) {
+            setActivated(true);
+        }
+        if(getCurrentValue() > 0 && getCurrentValue() == minLocalActivity)
+        {
+            setCurrentValue(getCurrentValue() + 1);
         }
         updateActivations();
     }
@@ -140,12 +140,6 @@ public class Column {
 
     public boolean isActivated() {
         return activated;
-    }
-
-    public void activate()
-    {
-        activated = true;
-        activationHistory++;
     }
 
     public void setActivated(boolean isActivated) {
@@ -184,7 +178,7 @@ public class Column {
         return currentValue;
     }
 
-    public void setCurrentValue(float currentValue) {
+    public void setCurrentValue(double currentValue) {
         this.currentValue = currentValue;
     }
 
@@ -211,9 +205,4 @@ public class Column {
     public void setsSignificantOverlaps(ArrayList<Boolean> significantOverlaps) {
         this.significantOverlaps = significantOverlaps;
     }
-
-    public int getActivationHistory() {
-        return activationHistory;
-    }
-    
 }
