@@ -6,7 +6,6 @@
 package htm;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Random;
 
 /**
@@ -16,12 +15,12 @@ import java.util.Random;
 public class HTM {
     private final static int NUMBER_OF_COLUMN=20;
     private final static int NUMBER_OF_INPUT=20;
-    private final static int CONNECTIVITY=50; //% de chance qu'un input soit relié à une column
-    private final static double SEUIL_SYNAPTIQUE=0.5; // minimum value for a synaps value to be activated
-    private final static double MIN_OVERLAP=1.5; //minimum value for a column value(= sum of activated synaps value) to be activated
+    private final static int CONNECTIVITY=50; //% chance to create a synapse (link between input and column) 
+    private final static double SEUIL_SYNAPTIQUE=0.5; // minimum value for a synapse value to be activated
+    private final static double MIN_OVERLAP=1.5; //minimum value for a column value(= sum of all activated synapses's value) to be activated
     private final static int ITERATION=500;
-    private final static int DESIRED_LOCAL_ACTIVITY=3;
-    private final static int INHIBITION_RADIUS = 3;
+    private final static int DESIRED_LOCAL_ACTIVITY=3; //a column is activiated only if its value is more than the value of its DESIRED_LOCAL_ACTIVITY neighbors
+    private final static int INHIBITION_RADIUS = 3;//the number of neighbors left (or right) for a column, so total neighbors for a column is INHIBITION_RADIUS*2
     
     private static Random random;
     
@@ -45,22 +44,25 @@ public class HTM {
     }
     
     private static void initialisation(){
+        // creation of inputs
         for(int i = 0; i < NUMBER_OF_INPUT; i++)
         {
             inputs.add(new Input(random.nextBoolean()));
         }
-        
+        // creation of columns...
         for(int i = 0; i < NUMBER_OF_COLUMN; i++)
         {
             columns.add(new Column(MIN_OVERLAP));
             for(Input input : inputs)
             {
+                //... and synapses between coluns and inputs with CONNECTIVITY % chance
                 if((random.nextInt(101))<=CONNECTIVITY)
                 {
                     columns.get(i).addSynaps(new Synapse(columns.get(i), input, SEUIL_SYNAPTIQUE));
                 }
             }
         }
+        
         setupNeighborsOfColumn();
     }
     
@@ -83,8 +85,8 @@ public class HTM {
     
     private static void iteration(){
         // newInputs();
-        reinitialisationColumns();
-        reinitialisationSynaps();
+        reinitialisationSynapse();
+        reinitialisationColumns();        
         inhibitionProcess();
         learning();
         //affichage TODO
@@ -120,10 +122,11 @@ public class HTM {
         for(Column column : columns)
         {
             column.setActivated(false);
+            column.valCol();;
         }
     }
     
-    private static void reinitialisationSynaps(){
+    private static void reinitialisationSynapse(){
         for(Column c : columns)
         {
             for(Synapse s : c.getsDendrite())

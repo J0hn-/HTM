@@ -17,17 +17,16 @@ public class Column {
     
     private boolean activated;
     private ArrayList<Synapse> dendrite = new ArrayList<>();
-    private double currentValue; 
+    private double currentValue; //sum of all synaptiques values of all activated synapses of it's dendrite
     
     private ArrayList<Column> neighbors = new ArrayList<>();
-    private double minOverlap;
+    private double minOverlap; //minimum value of its current value to be concidered as significant activated
       
-    private double boost;
-    private ArrayList<Boolean> activations = new ArrayList<>();
-    private ArrayList<Boolean> significantOverlaps = new ArrayList<>();
+    private double boost; //boost value for learning
+    private ArrayList<Boolean> activations = new ArrayList<>(); // list of its 1000 last states (activated or not)
+    private ArrayList<Boolean> significantOverlaps = new ArrayList<>(); // list of ots 1000 last significant overlaps states (sgnificant activated or not)
     
     private ArrayList<Cell> cells = new ArrayList<>();
-    private double tempValue;
     
     public Column(double MIN_OVERLAP){
         this.minOverlap = MIN_OVERLAP;
@@ -36,7 +35,8 @@ public class Column {
         this.currentValue = 0;
     }
     
-    public double valCol(){
+     // calculation of current value
+    public void valCol(){
         int value = 0;
         for(Synapse s : dendrite)
         {
@@ -49,11 +49,10 @@ public class Column {
         {
             value=0;
         }
-        return (LEARNING ? value*boost : value);         
+        currentValue = (LEARNING ? value*boost : value);         
     }
     
-    public void updateActivations()
-    {
+    public void updateActivations(){
         activations.add((activated ? true : false));
         if(activations.size() > 1000)
         {
@@ -61,8 +60,8 @@ public class Column {
         }
     }
     
-    public double activeDutyCycle()
-    {
+    //return % of activations over the last 1000 state
+    public double activeDutyCycle(){
         int compteur=0;
         for(boolean b : activations)
         {
@@ -74,17 +73,16 @@ public class Column {
         return compteur/activations.size();
     }
     
-    public void updateSignificantOverlaps()
-    {
-        significantOverlaps.add((valCol() > minOverlap ? true : false));
+    public void updateSignificantOverlaps(){
+        significantOverlaps.add((getCurrentValue() > minOverlap ? true : false));
         if(significantOverlaps.size() > 1000)
         {
             significantOverlaps.remove(0);
         }
     }
     
-    public double overlapDutyCycle()
-    {
+    //return % of significant activations over the last 1000 states
+    public double overlapDutyCycle(){
         int compteur=0;
         for(boolean b : significantOverlaps)
         {
@@ -96,6 +94,7 @@ public class Column {
         return compteur/significantOverlaps.size();
     }
     
+    // learning over the dendrite
     public void updateSynaps(){
         for(Synapse s : dendrite)
         {
@@ -103,23 +102,25 @@ public class Column {
         }
     }
     
+    // activation in function of its neighbors
     public void inhibition(int DESIRED_LOCAL_ACTIVITY){
         ArrayList<Column> sortedNeighbors = getsNeighbors();
             sortedNeighbors.sort( new Comparator<Column>() {
                 @Override
                 public int compare(Column c1, Column c2) {
-                    return Double.compare(c1.valCol(), c2.valCol());
+                    return Double.compare(c1.getCurrentValue(), c2.getCurrentValue());
                 }
             });
-            double minLocalActivity = getsNeighbors().get(DESIRED_LOCAL_ACTIVITY -1).valCol();
+            double minLocalActivity = getsNeighbors().get(DESIRED_LOCAL_ACTIVITY -1).getCurrentValue();
             
-            if(valCol() > 0 && valCol() > minLocalActivity)
+            if(getCurrentValue() > 0 && getCurrentValue() > minLocalActivity)
             {
                 setActivated(true);
             }
             updateActivations();
     }
     
+    // in its neighbors, return the maximum % of activations of the last 1000 states
     public double maxDutyCycle(){
         double max = 0;
         for(Column c : neighbors)
@@ -131,6 +132,8 @@ public class Column {
         }
         return max;
     }
+    
+    // boost for learning if necessary
     public void boost(){
         double activeDC = activeDutyCycle(); 
         double minDC = 0.01*maxDutyCycle();
