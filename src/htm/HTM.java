@@ -6,6 +6,7 @@
 package htm;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Random;
 
 /**
@@ -19,6 +20,7 @@ public class HTM {
     private final static double SEUIL_SYNAPTIQUE=0.5; // minimum value for a synaps value to be activated
     private final static double MIN_OVERLAP=1.5; //minimum value for a column value(= sum of activated synaps value) to be activated
     private final static int ITERATION=500;
+    private final static int DESIRED_LOCAL_ACTIVITY=3;
     
     private static Random random;
     
@@ -69,10 +71,17 @@ public class HTM {
         // newInputs();
         reinitialisationColumns();
         reinitialisationSynaps();
-        //inibition TODO
+        inhibitionProcess();
         learning();
         //affichage TODO
         
+    }
+    
+    private static void inhibitionProcess(){
+        for(Column c : columns)
+        {
+            c.inhibition(DESIRED_LOCAL_ACTIVITY);
+        }
     }
     
     private static void learning(){
@@ -82,6 +91,7 @@ public class HTM {
             {
                 c.updateSynaps();
             }
+            c.boost();
         }
     }
     
@@ -95,7 +105,7 @@ public class HTM {
     private static void reinitialisationColumns(){
         for(Column column : columns)
         {
-            column.setIsActivated(false);
+            column.setActivated(false);
         }
     }
     

@@ -6,6 +6,7 @@
 package htm;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  *
@@ -28,8 +29,12 @@ public class Column {
     private ArrayList<Cell> cells;
     private double tempValue;
     
-    public Column(double mo){
-        this.minOverlap = mo;
+    public Column(double MIN_OVERLAP){
+        this.activations = new ArrayList<Boolean>();
+        this.significantOverlaps = new ArrayList<Boolean>();
+        this.neighbors = new ArrayList<Column>();
+        this.cells = new ArrayList<Cell>();
+        this.minOverlap = MIN_OVERLAP;
         this.activated = false;
         this.boost = 1;
         this.currentValue = 0;
@@ -60,6 +65,19 @@ public class Column {
         }
     }
     
+    public double activeDutyCycle()
+    {
+        int compteur=0;
+        for(boolean b : activations)
+        {
+            if(b)
+            {
+                compteur++;
+            }
+        }
+        return compteur/activations.size();
+    }
+    
     public void updateSignificantOverlaps()
     {
         significantOverlaps.add((valCol() > minOverlap ? true : false));
@@ -69,10 +87,65 @@ public class Column {
         }
     }
     
+    public double overlapDutyCycle()
+    {
+        int compteur=0;
+        for(boolean b : significantOverlaps)
+        {
+            if(b)
+            {
+                compteur++;
+            }
+        }
+        return compteur/significantOverlaps.size();
+    }
+    
     public void updateSynaps(){
         for(Synapse s : dendrite)
         {
             s.setValeurSynaptique(s.getValeurSynaptique() + (s.passSyn() ? 0.1 : -0.1));
+        }
+    }
+    
+    public void inhibition(int DESIRED_LOCAL_ACTIVITY){
+        ArrayList<Column> sortedNeighbors = getsNeighbors();
+            sortedNeighbors.sort( new Comparator<Column>() {
+                @Override
+                public int compare(Column c1, Column c2) {
+                    return Double.compare(c1.valCol(), c2.valCol());
+                }
+            });
+            double minLocalActivity = getsNeighbors().get(DESIRED_LOCAL_ACTIVITY -1).valCol();
+            
+            if(valCol() > 0 && valCol() > minLocalActivity)
+            {
+                setActivated(true);
+            }
+            updateActivations();
+    }
+    
+    public double maxDutyCycle(){
+        double max = 0;
+        for(Column c : neighbors)
+        {
+            if(max < c.activeDutyCycle())
+            {
+                max = c.activeDutyCycle();
+            }
+        }
+        return max;
+    }
+    public void boost(){
+        double activeDC = activeDutyCycle(); 
+        double minDC = 0.01*maxDutyCycle();
+        boost = ( activeDC > minDC ? 1 : 1+(boost*(1+(- activeDC + minDC))) );
+        
+        if(overlapDutyCycle() < minDC)
+        {
+            for(Synapse s : dendrite)
+            {
+                s.setValeurSynaptique(s.getValeurSynaptique() + (0.1*s.getSeuilSynaptique()));
+            }
         }
     }
 
@@ -80,7 +153,7 @@ public class Column {
         return activated;
     }
 
-    public void setIsActivated(boolean isActivated) {
+    public void setActivated(boolean isActivated) {
         this.activated = isActivated;
     }
 

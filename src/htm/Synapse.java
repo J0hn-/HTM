@@ -19,13 +19,13 @@ public class Synapse {
     private Input input;
     private Column column;
     
-    public Synapse(Column c, Input i, double s){
+    public Synapse(Column c, Input i, double SEUIL_SYNAPTIQUE){
         Random r = new Random();
         this.input = i;
         this.column = c;
         this.activated = false;
         this.valeurSynaptique = (r.nextInt(11))/10;
-        this.seuilSynaptique = s;
+        this.seuilSynaptique = SEUIL_SYNAPTIQUE;
     }
     
     public boolean passSyn(){
