@@ -72,7 +72,7 @@ public class Column {
                 compteur++;
             }
         }
-        return compteur / activations.size();
+        return (double) compteur / (double) activations.size();
     }
 
     public void updateSignificantOverlaps() {
@@ -90,7 +90,7 @@ public class Column {
                 compteur++;
             }
         }
-        return compteur / significantOverlaps.size();
+        return (double) compteur / (double) significantOverlaps.size();
     }
 
     // learning over the dendrite
@@ -103,7 +103,7 @@ public class Column {
     // activation in function of its neighbors
     public void inhibition(int DESIRED_LOCAL_ACTIVITY) {
         ArrayList<Column> sortedNeighbors = getsNeighbors();
-        sortedNeighbors.sort((c1, c2) -> Double.compare(c1.getCurrentValue(), c2.getCurrentValue()));
+        sortedNeighbors.sort((c1, c2) -> Double.compare(c2.getCurrentValue(), c1.getCurrentValue()));
         double minLocalActivity = getsNeighbors().get(DESIRED_LOCAL_ACTIVITY - 1).getCurrentValue();
 
         if (getCurrentValue() > 0 && getCurrentValue() > minLocalActivity) {

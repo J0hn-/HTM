@@ -21,9 +21,12 @@ public class HTM {
     private static final double SEUIL_SYNAPTIQUE = 0.5; // minimum value for a synapse value to be activated
     private static final double MIN_OVERLAP = 1.5; //minimum value for a column value(= sum of all activated synapses's value) to be activated
     private static final int ITERATION  = 500;
-    private static final int DESIRED_LOCAL_ACTIVITY = 3; //a column is activiated only if its value is more than the value of its DESIRED_LOCAL_ACTIVITY neighbors
+    private static final int DESIRED_LOCAL_ACTIVITY = 1; //a column is activiated only if its value is more than the value of its DESIRED_LOCAL_ACTIVITY neighbors
     private static final int INHIBITION_RADIUS = 3;//the number of neighbors left (or right) for a column, so total neighbors for a column is INHIBITION_RADIUS*2
-    
+    private static final int POURCENTAGE_ACTIVATED_INPUTS = 20; //% of inputs activated at the same time
+
+    private ArrayList<Boolean> input = new ArrayList<>();
+    private int inputCursor;
     private static Random random;
     
     private ArrayList<Input> inputs = new ArrayList<>();
@@ -53,11 +56,21 @@ public class HTM {
     }
     
     private HTM(){
+        // generation of input
+        for (int i = 0; i < NUMBER_OF_INPUT*20; i++)
+        {
+            input.add(i >= i/NUMBER_OF_INPUT*NUMBER_OF_INPUT+i/NUMBER_OF_INPUT &&
+                    i < i/NUMBER_OF_INPUT*NUMBER_OF_INPUT+i/NUMBER_OF_INPUT+NUMBER_OF_INPUT*POURCENTAGE_ACTIVATED_INPUTS/100);
+            System.out.print((input.get(i) ? '●' : '○'));
+        }
+
         // creation of inputs
         for(int i = 0; i < NUMBER_OF_INPUT; i++)
         {
-            inputs.add(new Input(random.nextBoolean()));
+            inputs.add(new Input(input.get(i)));
         }
+        this.inputCursor = NUMBER_OF_INPUT;
+
         // creation of columns...
         for(int i = 0; i < NUMBER_OF_COLUMN; i++)
         {
@@ -93,7 +106,7 @@ public class HTM {
     }
     
     private void iteration(){
-        // newInputs();
+        newInputs();
         reinitialisationSynapse();
         reinitialisationColumns();        
         inhibitionProcess();
@@ -121,10 +134,13 @@ public class HTM {
     }
     
     private void newInputs(){
+        int i = 0;
         for(Input input : inputs)
         {
-            input.setValue(random.nextBoolean());
+            input.setValue(this.input.get(i + inputCursor));
+            i++;
         }
+        inputCursor = (inputCursor + NUMBER_OF_INPUT) % (NUMBER_OF_INPUT*20);
     }
     
     private void reinitialisationColumns(){
