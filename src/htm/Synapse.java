@@ -50,14 +50,6 @@ public class Synapse {
 
     public void setSeuilSynaptique(double seuilSynaptique) {
         this.seuilSynaptique = seuilSynaptique;
-        if(this.valeurSynaptique > 1)
-        {
-            valeurSynaptique = 1;
-        }
-        if(this.valeurSynaptique < 0)
-        {
-            valeurSynaptique = 0;
-        }
     }
 
     public double getValeurSynaptique() {
@@ -66,6 +58,14 @@ public class Synapse {
 
     public void setValeurSynaptique(double valeurSynaptique) {
         this.valeurSynaptique = valeurSynaptique;
+        if(this.valeurSynaptique > 1)
+        {
+            this.valeurSynaptique = 1;
+        }
+        if(this.valeurSynaptique < 0)
+        {
+            this.valeurSynaptique = 0;
+        }
     }
 
     public Input getInput() {

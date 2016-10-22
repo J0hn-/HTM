@@ -8,6 +8,8 @@ package htm;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static java.lang.Thread.sleep;
+
 /**
  *
  * @author HP
@@ -15,7 +17,7 @@ import java.util.Random;
 public class HTM {
     private static final int NUMBER_OF_COLUMN = 20;
     private static final int NUMBER_OF_INPUT = 20;
-    private static final int CONNECTIVITY = 50; //% chance to create a synapse (link between input and column)
+    private static final int CONNECTIVITY = 100; //% chance to create a synapse (link between input and column)
     private static final double SEUIL_SYNAPTIQUE = 0.5; // minimum value for a synapse value to be activated
     private static final double MIN_OVERLAP = 1.5; //minimum value for a column value(= sum of all activated synapses's value) to be activated
     private static final int ITERATION  = 500;
@@ -39,8 +41,14 @@ public class HTM {
         int i = 0;
         while(i < ITERATION)
         {
+            System.out.println(i);
             htm.iteration();
             i++;
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
     
@@ -75,12 +83,12 @@ public class HTM {
                 if(j > 0 && j < NUMBER_OF_COLUMN && j != i)
                 {
                     n.add(columns.get(j));
-                    System.out.println(j);
+                    //System.out.println(j);
                 }
 
             }
             columns.get(i).setsNeighbors(n);
-            System.out.println("- " + i);
+            //System.out.println("- " + i);
         }
     }
     
@@ -106,7 +114,7 @@ public class HTM {
         {
             if(c.isActivated())
             {
-                c.updateSynaps();
+                c.updateSynapse();
             }
             c.boost();
         }
@@ -123,7 +131,7 @@ public class HTM {
         for(Column column : columns)
         {
             column.setActivated(false);
-            column.valCol();;
+            column.valCol();
         }
     }
     
@@ -141,25 +149,36 @@ public class HTM {
     public String toString() {
         String s = "HTM" + System.lineSeparator();
         s += "Columns:";
-        String t = "States: ";
+        String t = "States:  ";
         for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
             s += " " + i;
+
             if (columns.get(i).isActivated())
-                t += " ■";
+                t += "■";
             else
-                t += " □";
+                t += "□";
+
+            for(int j = 0; j <= i/10; j++)
+                t += ' ';
         }
         s += System.lineSeparator() + t + System.lineSeparator();
-        s += "Inputs:";
-        t = "States:";
+        s += "Inputs: ";
+        t = "States:  ";
         for(int i = 0; i < NUMBER_OF_INPUT; i++) {
             s += " " + i;
             if (inputs.get(i).isValue())
-                t += " ●";
+                t += "●";
             else
-                t += " ○";
+                t += "○";
+            for(int j = 0; j <= i/10; j++)
+                t += ' ';
         }
         s += System.lineSeparator() + t + System.lineSeparator();
+        s += "Values:";
+        for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
+            s += " " + columns.get(i).getCurrentValue();
+        }
+        s += System.lineSeparator();
         return s;
     }
 }
