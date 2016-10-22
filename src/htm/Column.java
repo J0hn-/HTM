@@ -14,17 +14,19 @@ import java.util.ArrayList;
 public class Column {
     private static boolean LEARNING=true;
     
-    private double minOverlap;
-    
     private boolean activated;
-    private ArrayList<Cell> cells;
-    private ArrayList<Column> neighbors;
     private ArrayList<Synaps> dendrite;
-    private double currentValue;
+    private double currentValue; 
     
+    private ArrayList<Column> neighbors;
+    private double minOverlap;
+      
     private double boost;
-    private boolean[] activations;
-    private boolean[] significantOverlaps;
+    private ArrayList<Boolean> activations;
+    private ArrayList<Boolean> significantOverlaps;
+    
+    private ArrayList<Cell> cells;
+    private double tempValue;
     
     public Column(double mo){
         this.minOverlap = mo;
@@ -47,6 +49,24 @@ public class Column {
             value=0;
         }
         return (LEARNING ? value*boost : value);         
+    }
+    
+    public void updateActivations()
+    {
+        activations.add((activated ? true : false));
+        if(activations.size() > 1000)
+        {
+            activations.remove(0);
+        }
+    }
+    
+    public void updateSignificantOverlaps()
+    {
+        significantOverlaps.add((valCol() > minOverlap ? true : false));
+        if(significantOverlaps.size() > 1000)
+        {
+            significantOverlaps.remove(0);
+        }
     }
     
     public void updateSynaps(){
@@ -108,19 +128,19 @@ public class Column {
         this.boost = boost;
     }
 
-    public boolean[] getsActivations() {
+    public ArrayList<Boolean> getsActivations() {
         return activations;
     }
 
-    public void setsActivations(boolean[] activations) {
+    public void setsActivations(ArrayList<Boolean> activations) {
         this.activations = activations;
     }
 
-    public boolean[] getsSignificantOverlaps() {
+    public ArrayList<Boolean> getsSignificantOverlaps() {
         return significantOverlaps;
     }
 
-    public void setsSignificantOverlaps(boolean[] significantOverlaps) {
+    public void setsSignificantOverlaps(ArrayList<Boolean> significantOverlaps) {
         this.significantOverlaps = significantOverlaps;
     }
     

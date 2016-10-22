@@ -30,7 +30,9 @@ public class HTM {
      */
     public static void main(String[] args) {
         random = new Random();
+        
         initialisation();
+        
         int i=0;
         while(i<ITERATION)
         {
@@ -67,7 +69,20 @@ public class HTM {
         // newInputs();
         reinitialisationColumns();
         reinitialisationSynaps();
+        //inibition TODO
+        learning();
+        //affichage TODO
         
+    }
+    
+    private static void learning(){
+        for(Column c : columns)
+        {
+            if(c.isActivated())
+            {
+                c.updateSynaps();
+            }
+        }
     }
     
     private static void newInputs(){
