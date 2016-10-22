@@ -13,7 +13,7 @@ import java.util.Comparator;
  * @author HP
  */
 public class Column {
-    private final static boolean LEARNING=true;
+    private final static boolean LEARNING = true;
     
     private boolean activated;
     private ArrayList<Synapse> dendrite = new ArrayList<>();
@@ -53,7 +53,7 @@ public class Column {
     }
     
     public void updateActivations(){
-        activations.add((activated ? true : false));
+        activations.add((activated));
         if(activations.size() > 1000)
         {
             activations.remove(0);
@@ -74,7 +74,7 @@ public class Column {
     }
     
     public void updateSignificantOverlaps(){
-        significantOverlaps.add((getCurrentValue() > minOverlap ? true : false));
+        significantOverlaps.add((getCurrentValue() > minOverlap));
         if(significantOverlaps.size() > 1000)
         {
             significantOverlaps.remove(0);
@@ -91,7 +91,7 @@ public class Column {
                 compteur++;
             }
         }
-        return compteur/significantOverlaps.size();
+        return compteur/significantOverlaps.size()+1;
     }
     
     // learning over the dendrite

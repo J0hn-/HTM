@@ -13,37 +13,38 @@ import java.util.Random;
  * @author HP
  */
 public class HTM {
-    private final static int NUMBER_OF_COLUMN=20;
-    private final static int NUMBER_OF_INPUT=20;
-    private final static int CONNECTIVITY=50; //% chance to create a synapse (link between input and column) 
-    private final static double SEUIL_SYNAPTIQUE=0.5; // minimum value for a synapse value to be activated
-    private final static double MIN_OVERLAP=1.5; //minimum value for a column value(= sum of all activated synapses's value) to be activated
-    private final static int ITERATION=500;
-    private final static int DESIRED_LOCAL_ACTIVITY=3; //a column is activiated only if its value is more than the value of its DESIRED_LOCAL_ACTIVITY neighbors
-    private final static int INHIBITION_RADIUS = 3;//the number of neighbors left (or right) for a column, so total neighbors for a column is INHIBITION_RADIUS*2
+    private static final int NUMBER_OF_COLUMN = 20;
+    private static final int NUMBER_OF_INPUT = 20;
+    private static final int CONNECTIVITY = 50; //% chance to create a synapse (link between input and column)
+    private static final double SEUIL_SYNAPTIQUE = 0.5; // minimum value for a synapse value to be activated
+    private static final double MIN_OVERLAP = 1.5; //minimum value for a column value(= sum of all activated synapses's value) to be activated
+    private static final int ITERATION  = 500;
+    private static final int DESIRED_LOCAL_ACTIVITY = 3; //a column is activiated only if its value is more than the value of its DESIRED_LOCAL_ACTIVITY neighbors
+    private static final int INHIBITION_RADIUS = 3;//the number of neighbors left (or right) for a column, so total neighbors for a column is INHIBITION_RADIUS*2
     
     private static Random random;
     
-    private static ArrayList<Input> inputs = new ArrayList<>();
-    private static ArrayList<Column> columns = new ArrayList<>();
+    private ArrayList<Input> inputs = new ArrayList<>();
+    private ArrayList<Column> columns = new ArrayList<>();
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         random = new Random();
+
+        // Initialisation
+        HTM htm = new HTM();
         
-        initialisation();
-        
-        int i=0;
-        while(i<ITERATION)
+        int i = 0;
+        while(i < ITERATION)
         {
-            iteration();
+            htm.iteration();
             i++;
         }
     }
     
-    private static void initialisation(){
+    private HTM(){
         // creation of inputs
         for(int i = 0; i < NUMBER_OF_INPUT; i++)
         {
@@ -66,7 +67,7 @@ public class HTM {
         setupNeighborsOfColumn();
     }
     
-    private static void setupNeighborsOfColumn(){
+    private void setupNeighborsOfColumn(){
         for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
             ArrayList<Column> n = new ArrayList<>();
             for (int j = i - INHIBITION_RADIUS; j <= i + INHIBITION_RADIUS; j++)
@@ -83,24 +84,24 @@ public class HTM {
         }
     }
     
-    private static void iteration(){
+    private void iteration(){
         // newInputs();
         reinitialisationSynapse();
         reinitialisationColumns();        
         inhibitionProcess();
         learning();
-        //affichage TODO
+        System.out.println(this);
         
     }
     
-    private static void inhibitionProcess(){
+    private void inhibitionProcess(){
         for(Column c : columns)
         {
             c.inhibition(DESIRED_LOCAL_ACTIVITY);
         }
     }
     
-    private static void learning(){
+    private void learning(){
         for(Column c : columns)
         {
             if(c.isActivated())
@@ -111,14 +112,14 @@ public class HTM {
         }
     }
     
-    private static void newInputs(){
+    private void newInputs(){
         for(Input input : inputs)
         {
             input.setValue(random.nextBoolean());
         }
     }
     
-    private static void reinitialisationColumns(){
+    private void reinitialisationColumns(){
         for(Column column : columns)
         {
             column.setActivated(false);
@@ -126,7 +127,7 @@ public class HTM {
         }
     }
     
-    private static void reinitialisationSynapse(){
+    private void reinitialisationSynapse(){
         for(Column c : columns)
         {
             for(Synapse s : c.getsDendrite())
@@ -134,5 +135,31 @@ public class HTM {
                 s.activate();
             }
         }
-    }       
+    }
+
+    @Override
+    public String toString() {
+        String s = "HTM" + System.lineSeparator();
+        s += "Columns:";
+        String t = "States: ";
+        for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
+            s += " " + i;
+            if (columns.get(i).isActivated())
+                t += " ■";
+            else
+                t += " □";
+        }
+        s += System.lineSeparator() + t + System.lineSeparator();
+        s += "Inputs:";
+        t = "States:";
+        for(int i = 0; i < NUMBER_OF_INPUT; i++) {
+            s += " " + i;
+            if (inputs.get(i).isValue())
+                t += " ●";
+            else
+                t += " ○";
+        }
+        s += System.lineSeparator() + t + System.lineSeparator();
+        return s;
+    }
 }
