@@ -21,11 +21,12 @@ public class HTM {
     private final static double MIN_OVERLAP=1.5; //minimum value for a column value(= sum of activated synaps value) to be activated
     private final static int ITERATION=500;
     private final static int DESIRED_LOCAL_ACTIVITY=3;
+    private final static int INHIBITION_RADIUS = 3;
     
     private static Random random;
     
-    private static ArrayList<Input> inputs;
-    private static ArrayList<Column> columns;
+    private static ArrayList<Input> inputs = new ArrayList<>();
+    private static ArrayList<Column> columns = new ArrayList<>();
 
     /**
      * @param args the command line arguments
@@ -64,7 +65,20 @@ public class HTM {
     }
     
     private static void setupNeighborsOfColumn(){
-        //TODO
+        for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
+            ArrayList<Column> n = new ArrayList<>();
+            for (int j = i - INHIBITION_RADIUS; j <= i + INHIBITION_RADIUS; j++)
+            {
+                if(j > 0 && j < NUMBER_OF_COLUMN && j != i)
+                {
+                    n.add(columns.get(j));
+                    System.out.println(j);
+                }
+
+            }
+            columns.get(i).setsNeighbors(n);
+            System.out.println("- " + i);
+        }
     }
     
     private static void iteration(){

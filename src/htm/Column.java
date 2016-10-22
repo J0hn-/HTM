@@ -16,24 +16,20 @@ public class Column {
     private final static boolean LEARNING=true;
     
     private boolean activated;
-    private ArrayList<Synapse> dendrite;
+    private ArrayList<Synapse> dendrite = new ArrayList<>();
     private double currentValue; 
     
-    private ArrayList<Column> neighbors;
+    private ArrayList<Column> neighbors = new ArrayList<>();
     private double minOverlap;
       
     private double boost;
-    private ArrayList<Boolean> activations;
-    private ArrayList<Boolean> significantOverlaps;
+    private ArrayList<Boolean> activations = new ArrayList<>();
+    private ArrayList<Boolean> significantOverlaps = new ArrayList<>();
     
-    private ArrayList<Cell> cells;
+    private ArrayList<Cell> cells = new ArrayList<>();
     private double tempValue;
     
     public Column(double MIN_OVERLAP){
-        this.activations = new ArrayList<Boolean>();
-        this.significantOverlaps = new ArrayList<Boolean>();
-        this.neighbors = new ArrayList<Column>();
-        this.cells = new ArrayList<Cell>();
         this.minOverlap = MIN_OVERLAP;
         this.activated = false;
         this.boost = 1;
