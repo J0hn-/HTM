@@ -12,10 +12,10 @@ import java.util.ArrayList;
  * @author HP
  */
 public class Column {
-    private static boolean LEARNING=true;
+    private final static boolean LEARNING=true;
     
     private boolean activated;
-    private ArrayList<Synaps> dendrite;
+    private ArrayList<Synapse> dendrite;
     private double currentValue; 
     
     private ArrayList<Column> neighbors;
@@ -37,7 +37,7 @@ public class Column {
     
     public double valCol(){
         int value = 0;
-        for(Synaps s : dendrite)
+        for(Synapse s : dendrite)
         {
             if(s.passSyn())
             {
@@ -70,7 +70,7 @@ public class Column {
     }
     
     public void updateSynaps(){
-        for(Synaps s : dendrite)
+        for(Synapse s : dendrite)
         {
             s.setValeurSynaptique(s.getValeurSynaptique() + (s.passSyn() ? 0.1 : -0.1));
         }
@@ -100,15 +100,15 @@ public class Column {
         this.neighbors = neighbors;
     }
 
-    public ArrayList<Synaps> getsDendrite() {
+    public ArrayList<Synapse> getsDendrite() {
         return dendrite;
     }
 
-    public void setsDendrite(ArrayList<Synaps> dentrite) {
+    public void setsDendrite(ArrayList<Synapse> dentrite) {
         this.dendrite = dentrite;
     }
     
-    public void addSynaps(Synaps s){
+    public void addSynaps(Synapse s){
         this.dendrite.add(s);
     }
 

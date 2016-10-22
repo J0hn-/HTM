@@ -11,7 +11,7 @@ import java.util.Random;
  *
  * @author HP
  */
-public class Synaps {
+public class Synapse {
     
     private boolean activated;
     private double seuilSynaptique;
@@ -19,7 +19,7 @@ public class Synaps {
     private Input input;
     private Column column;
     
-    public Synaps(Column c, Input i, double s){
+    public Synapse(Column c, Input i, double s){
         Random r = new Random();
         this.input = i;
         this.column = c;

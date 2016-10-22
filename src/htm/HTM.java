@@ -13,12 +13,12 @@ import java.util.Random;
  * @author HP
  */
 public class HTM {
-    private static int NUMBER_OF_COLUMN=20;
-    private static int NUMBER_OF_INPUT=20;
-    private static int CONNECTIVITY=50; //% de chance qu'un input soit relié à une column
-    private static double SEUIL_SYNAPTIQUE=0.5; // minimum value for a synaps value to be activated 
-    private static double MIN_OVERLAP=1.5; //minimum value for a column value(= sum of activated synaps value) to be activated
-    private static int ITERATION=500;
+    private final static int NUMBER_OF_COLUMN=20;
+    private final static int NUMBER_OF_INPUT=20;
+    private final static int CONNECTIVITY=50; //% de chance qu'un input soit relié à une column
+    private final static double SEUIL_SYNAPTIQUE=0.5; // minimum value for a synaps value to be activated
+    private final static double MIN_OVERLAP=1.5; //minimum value for a column value(= sum of activated synaps value) to be activated
+    private final static int ITERATION=500;
     
     private static Random random;
     
@@ -54,7 +54,7 @@ public class HTM {
             {
                 if((random.nextInt(101))<=CONNECTIVITY)
                 {
-                    columns.get(i).addSynaps(new Synaps(columns.get(i), input, SEUIL_SYNAPTIQUE));
+                    columns.get(i).addSynaps(new Synapse(columns.get(i), input, SEUIL_SYNAPTIQUE));
                 }
             }
         }
@@ -102,7 +102,7 @@ public class HTM {
     private static void reinitialisationSynaps(){
         for(Column c : columns)
         {
-            for(Synaps s : c.getsDendrite())
+            for(Synapse s : c.getsDendrite())
             {
                 s.activate();
             }
