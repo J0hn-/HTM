@@ -21,7 +21,7 @@ public class HTM {
     private static final double SEUIL_SYNAPTIQUE = 0.5; // minimum value for a synapse value to be activated
     private static final double MIN_OVERLAP = 1.5; //minimum value for a column value(= sum of all activated synapses's value) to be activated
     private static final int ITERATION  = 500;
-    private static final int DESIRED_LOCAL_ACTIVITY = 3; //a column is activiated only if its value is more than the value of its DESIRED_LOCAL_ACTIVITY neighbors
+    private static final int DESIRED_LOCAL_ACTIVITY = 1; //a column is activiated only if its value is more than the value of its DESIRED_LOCAL_ACTIVITY neighbors
     private static final int INHIBITION_RADIUS = 3;//the number of neighbors left (or right) for a column, so total neighbors for a column is INHIBITION_RADIUS*2
     
     private static Random random;
@@ -80,7 +80,7 @@ public class HTM {
             ArrayList<Column> n = new ArrayList<>();
             for (int j = i - INHIBITION_RADIUS; j <= i + INHIBITION_RADIUS; j++)
             {
-                if(j > 0 && j < NUMBER_OF_COLUMN && j != i)
+                if(j >= 0 && j < NUMBER_OF_COLUMN && j != i)
                 {
                     n.add(columns.get(j));
                     //System.out.println(j);
@@ -177,6 +177,11 @@ public class HTM {
         s += "Values:";
         for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
             s += " " + columns.get(i).getCurrentValue();
+        }
+         s += System.lineSeparator() + t + System.lineSeparator();
+        s += "boost:";
+        for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
+            s += " " + columns.get(i).getBoost();
         }
         s += System.lineSeparator();
         return s;
