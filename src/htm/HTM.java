@@ -48,7 +48,7 @@ public class HTM {
             htm.iteration();
             i++;
             try {
-                sleep(1000);
+                sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -161,43 +161,54 @@ public class HTM {
         }
     }
 
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+
     @Override
     public String toString() {
         String s = "HTM" + System.lineSeparator();
-        s += "Columns:";
-        String t = "States:  ";
+        s += "Colmns:";
+        String t = "States:";
         for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
-            s += " " + i;
+            s += "\t" + i;
 
             if (columns.get(i).isActivated())
-                t += "■";
+                t += ANSI_GREEN + "\t■" + ANSI_RESET;
             else
-                t += "□";
-
-            for(int j = 0; j <= i/10; j++)
-                t += ' ';
+                t += ANSI_RED +"\t□" + ANSI_RESET;
         }
         s += System.lineSeparator() + t + System.lineSeparator();
-        s += "Inputs: ";
-        t = "States:  ";
+        s += "Inputs:";
+        t = "States:";
         for(int i = 0; i < NUMBER_OF_INPUT; i++) {
-            s += " " + i;
+            s += "\t" + i;
             if (inputs.get(i).isValue())
-                t += "●";
+                t += ANSI_YELLOW + "\t●" + ANSI_RESET;
             else
-                t += "○";
-            for(int j = 0; j <= i/10; j++)
-                t += ' ';
+                t += ANSI_BLUE + "\t○" + ANSI_RESET;
         }
         s += System.lineSeparator() + t + System.lineSeparator();
         s += "Values:";
         for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
-            s += " " + columns.get(i).getCurrentValue();
+            if (columns.get(i).isActivated())
+                s += ANSI_GREEN + "\t" + columns.get(i).getCurrentValue() + ANSI_RESET;
+            else
+                s += ANSI_RED +"\t" + columns.get(i).getCurrentValue() + ANSI_RESET;
         }
-         s += System.lineSeparator() + t + System.lineSeparator();
-        s += "boost:";
+         s += System.lineSeparator();
+        s += "Boost:";
         for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
-            s += " " + columns.get(i).getBoost();
+            if (columns.get(i).isActivated())
+                s += ANSI_CYAN + "\t" + columns.get(i).getBoost() + ANSI_RESET;
+            else
+                s += ANSI_PURPLE +"\t" + columns.get(i).getBoost() + ANSI_RESET;
         }
         s += System.lineSeparator();
         return s;
