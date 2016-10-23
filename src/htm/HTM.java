@@ -62,8 +62,9 @@ public class HTM {
         // generation of input
         for (int i = 0; i < NUMBER_OF_INPUT*20; i++)
         {
-            input.add(i >= i/NUMBER_OF_INPUT*NUMBER_OF_INPUT+i/NUMBER_OF_INPUT &&
-                    i < i/NUMBER_OF_INPUT*NUMBER_OF_INPUT+i/NUMBER_OF_INPUT+NUMBER_OF_INPUT*POURCENTAGE_ACTIVATED_INPUTS/100);
+            //input.add(i >= i/NUMBER_OF_INPUT*NUMBER_OF_INPUT+i/NUMBER_OF_INPUT &&
+            //        i < i/NUMBER_OF_INPUT*NUMBER_OF_INPUT+i/NUMBER_OF_INPUT+NUMBER_OF_INPUT*POURCENTAGE_ACTIVATED_INPUTS/100);
+            input.add(i%2 == 0);
             //System.out.print((input.get(i) ? '●' : '○'));
         }
 
@@ -194,7 +195,8 @@ public class HTM {
         int i = 0;
         for(Input input : inputs)
         {
-            input.setValue(this.input.get(i + inputCursor));
+            input.setValue(!input.isValue());
+            //input.setValue(this.input.get(i + inputCursor));
             i++;
         }
         inputCursor = (inputCursor + NUMBER_OF_INPUT) % (NUMBER_OF_INPUT*20);
