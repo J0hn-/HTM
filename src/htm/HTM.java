@@ -236,12 +236,39 @@ public class HTM {
         for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
             s += "\t" + i;
 
-            if (columns.get(i).isActivated())
+            if (columns.get(i).isActivated() && columns.get(i).isPredictateState())
+                t += ANSI_PURPLE + "\t■" + ANSI_RESET;
+            else if (columns.get(i).isActivated())
                 t += ANSI_GREEN + "\t■" + ANSI_RESET;
+            else if(columns.get(i).isPredictateState())
+                t += ANSI_CYAN +"\t□" + ANSI_RESET;
             else
                 t += ANSI_RED +"\t□" + ANSI_RESET;
         }
         s += System.lineSeparator() + t + System.lineSeparator();
+        ArrayList<String> cells = new ArrayList<>();
+        cells.add("Cells:");
+        for (int i = 1; i < NUMBER_OF_CELL; i++) {
+            cells.add("\t");
+        }
+        for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
+            for(int j = 0; j < NUMBER_OF_CELL; j++) {
+                Cell c = columns.get(i).getsCells().get(j);
+                String z = cells.get(j);
+                if (c.isActiveState() && c.isPredictateState())
+                    z += ANSI_PURPLE + "\t●" + ANSI_RESET;
+                else if (c.isActiveState())
+                    z += ANSI_GREEN + "\t●" + ANSI_RESET;
+                else if (c.isPredictateState())
+                    z += ANSI_CYAN +"\t○" + ANSI_RESET;
+                else
+                    z += ANSI_RED +"\t○" + ANSI_RESET;
+                cells.set(j,z);
+            }
+        }
+        for (String w: cells) {
+            s += w + System.lineSeparator();
+        }
         s += "Inputs:";
         t = "States:";
         for(int i = 0; i < NUMBER_OF_INPUT; i++) {
@@ -263,21 +290,11 @@ public class HTM {
         s += "Boost:";
         for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
             if (columns.get(i).isActivated())
-                s += ANSI_CYAN + "\t" + columns.get(i).getBoost() + ANSI_RESET;
+                s += ANSI_GREEN + "\t" + columns.get(i).getBoost() + ANSI_RESET;
             else
-                s += ANSI_PURPLE +"\t" + columns.get(i).getBoost() + ANSI_RESET;
+                s += ANSI_RED +"\t" + columns.get(i).getBoost() + ANSI_RESET;
         }
         s += System.lineSeparator();
-        s += "Predictate Columns:";
-        t = "States:            ";
-        for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
-            s += "\t" + i;
-            if (columns.get(i).isPredictateState())
-                t += ANSI_YELLOW + "\t■" + ANSI_RESET;
-            else
-                t += ANSI_BLUE + "\t□" + ANSI_RESET;
-        }
-        s += System.lineSeparator() + t + System.lineSeparator();
         return s;
     }
 }
