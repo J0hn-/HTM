@@ -19,11 +19,14 @@ public class HTM {
     private static final int NUMBER_OF_INPUT = 20;
     private static final int CONNECTIVITY = 100; //% chance to create a synapse (link between input and column)
     private static final double SEUIL_SYNAPTIQUE = 0.5; // minimum value for a synapse value to be activated
-    private static final double MIN_OVERLAP = 1.5; //minimum value for a column value(= sum of all activated synapses's value) to be activated
+    private static final double MIN_OVERLAP = 1.0; //minimum value for a column value(= sum of all activated synapses's value) to be activated
     private static final int ITERATION  = 500;
     private static final int DESIRED_LOCAL_ACTIVITY = 1; //a column is activiated only if its value is more than the value of its DESIRED_LOCAL_ACTIVITY neighbors
     private static final int INHIBITION_RADIUS = 3;//the number of neighbors left (or right) for a column, so total neighbors for a column is INHIBITION_RADIUS*2
     private static final int POURCENTAGE_ACTIVATED_INPUTS = 20; //% of inputs activated at the same time
+    private static final double PERMANENCE_THRESHOLD=0.5; // minimum value for a CellSynapse permanence to be connected
+    private static final int CELL_DENDRITE_THRESHOLD=5; //minium number of cellDendrite semgment active connected synapse to be activated 
+    private static final int NUMBER_OF_CELL=3;
 
     private ArrayList<Boolean> input = new ArrayList<>();
     private int inputCursor;
@@ -61,7 +64,7 @@ public class HTM {
         {
             input.add(i >= i/NUMBER_OF_INPUT*NUMBER_OF_INPUT+i/NUMBER_OF_INPUT &&
                     i < i/NUMBER_OF_INPUT*NUMBER_OF_INPUT+i/NUMBER_OF_INPUT+NUMBER_OF_INPUT*POURCENTAGE_ACTIVATED_INPUTS/100);
-            System.out.print((input.get(i) ? '●' : '○'));
+            //System.out.print((input.get(i) ? '●' : '○'));
         }
 
         // creation of inputs
@@ -74,7 +77,7 @@ public class HTM {
         // creation of columns...
         for(int i = 0; i < NUMBER_OF_COLUMN; i++)
         {
-            columns.add(new Column(MIN_OVERLAP));
+            columns.add(new Column(MIN_OVERLAP, NUMBER_OF_CELL, CELL_DENDRITE_THRESHOLD));
             for(Input input : inputs)
             {
                 //... and synapses between coluns and inputs with CONNECTIVITY % chance
@@ -83,9 +86,13 @@ public class HTM {
                     columns.get(i).addSynaps(new Synapse(columns.get(i), input, SEUIL_SYNAPTIQUE));
                 }
             }
-        }
-        
+        }        
         setupNeighborsOfColumn();
+        // creation of cellSynapse
+        for(int i = 0; i < NUMBER_OF_COLUMN; i++)
+        {
+            columns.get(i).setupCells(columns, PERMANENCE_THRESHOLD);
+        }   
     }
     
     private void setupNeighborsOfColumn(){
@@ -111,8 +118,20 @@ public class HTM {
         reinitialisationColumns();        
         inhibitionProcess();
         learning();
+        temporalProcess();
         System.out.println(this);
         
+    }
+    
+    private void temporalProcess(){
+        for(Column c : columns)
+        {
+            c.cellsActivation();
+        }
+        for(Column c : columns)
+        {
+            c.cellsPrediction();
+        }
     }
     
     private void inhibitionProcess(){
@@ -125,12 +144,50 @@ public class HTM {
     private void learning(){
         for(Column c : columns)
         {
+            // Spatial learning
             if(c.isActivated())
             {
                 c.updateSynapse();
             }
             c.boost();
-        }
+            // temporal learning
+            boolean correctPredicate = false;
+            // check if previous predictate was correct
+            if(c.isPredictateState() && c.isActivated())
+            {
+                correctPredicate = true;
+            }
+            // learning depend on correct predicate or not
+            for(Cell cell : c.getsCells())
+            {
+                for(CellSynapse cs : cell.getDendrite())
+                {
+                    if(cs.isActivePredictate())
+                    {
+                        cs.setPermanence(cs.getPermanence() + (correctPredicate ? 0.1 : -0.1));
+                    }
+                    if(cs.isDesactivePredictate())
+                    {
+                        cs.setPermanence(cs.getPermanence() + (correctPredicate ? -0.1 : 0));
+                    }
+                    if(cs.isActivePotentialPredictate())
+                    {
+                        cs.setPermanence(cs.getPermanence() + (c.isActivated() ? 0.1 : -0.1));
+                    }
+                    if(cs.isDesactivePotentialPredictate())
+                    {
+                        cs.setPermanence(cs.getPermanence() + (c.isActivated() ? -0.1 : 0));
+                    }
+                    // reset cellSynapse predictate state
+                    cs.setActivePredictate(false);
+                    cs.setDesactivePredictate(false);
+                    cs.setActivePotentialPredictate(false);
+                    cs.setDesactivePotentialPredictate(false);
+                }
+            }
+            // reset column predictate state
+            c.setPredictateState(false);
+        }        
     }
     
     private void newInputs(){
@@ -211,6 +268,16 @@ public class HTM {
                 s += ANSI_PURPLE +"\t" + columns.get(i).getBoost() + ANSI_RESET;
         }
         s += System.lineSeparator();
+        s += "Predictate Columns:";
+        t = "States:            ";
+        for(int i = 0; i < NUMBER_OF_COLUMN; i++) {
+            s += "\t" + i;
+            if (columns.get(i).isPredictateState())
+                t += ANSI_YELLOW + "\t■" + ANSI_RESET;
+            else
+                t += ANSI_BLUE + "\t□" + ANSI_RESET;
+        }
+        s += System.lineSeparator() + t + System.lineSeparator();
         return s;
     }
 }

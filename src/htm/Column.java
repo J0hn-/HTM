@@ -30,14 +30,37 @@ public class Column {
     private ArrayList<Boolean> significantOverlaps = new ArrayList<>(); // list of ots 1000 last significant overlaps states (sgnificant activated or not)
 
     private ArrayList<Cell> cells = new ArrayList<>();
+    private boolean predictateState;
 
-    public Column(double MIN_OVERLAP) {
+    public Column(double MIN_OVERLAP, int NUMBER_OF_CELL, int CELL_DENDRITE_THRESHOLD) {
         this.minOverlap = MIN_OVERLAP;
         this.activated = false;
         this.boost = 1;
         this.currentValue = 0;
         activations.add(false);
         significantOverlaps.add(false);
+        predictateState=false;
+        for(int i=0; i<NUMBER_OF_CELL; i++)
+        {
+            this.cells.add(new Cell(CELL_DENDRITE_THRESHOLD));
+        }
+    }
+    
+    public void setupCells(ArrayList<Column> columns, double PERMANENCE_THRESHOLD){
+        for(Column c : columns)
+        {
+            if(c!=this)
+            {
+                for(Cell thisCell : cells)
+                {
+                    for(Cell otherCell : c.getsCells())
+                    {
+                        thisCell.addCellSynapse(otherCell, thisCell, PERMANENCE_THRESHOLD);
+                    }
+                }
+            }
+        }
+    
     }
 
     // calculation of current value
@@ -137,6 +160,39 @@ public class Column {
             }
         }
     }
+    
+    public void cellsActivation(){
+        boolean predictateActivation = false;
+        // activate predictates cells
+        for(Cell c : cells)
+        {
+            c.setActiveState(false);
+            if(c.isPredictateState())
+            {
+                c.setActiveState(true);
+                predictateActivation = true;
+            }
+        }
+        
+        for(Cell c : cells)
+        {
+            // if no predicate cell, activate all cells
+            if(!predictateActivation)
+            {
+                c.setActiveState(true);
+            }
+            // reset predictate state of cells
+            c.setPredictateState(false);
+        }
+    }
+    
+    public void cellsPrediction(){
+        for(Cell c : cells)
+        {
+            //column is in predictate state if at least one of its cell become predictate
+            predictateState = predictateState || c.predictate();
+        }
+    }
 
     public boolean isActivated() {
         return activated;
@@ -205,4 +261,14 @@ public class Column {
     public void setsSignificantOverlaps(ArrayList<Boolean> significantOverlaps) {
         this.significantOverlaps = significantOverlaps;
     }
+
+    public boolean isPredictateState() {
+        return predictateState;
+    }
+
+    public void setPredictateState(boolean predictateState) {
+        this.predictateState = predictateState;
+    }
+    
+    
 }
